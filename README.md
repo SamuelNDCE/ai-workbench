@@ -119,7 +119,7 @@ Counts are how many times each skill was invoked by name in my Claude Code sessi
 
 Rows marked 0 were not invoked in this window. Some are insurance skills you want to exist and never call often (leak retraction, full audits), and some I have simply outgrown. They stay because they still work.
 
-**Used a lot, not published here:** a private set of about two dozen `nv-*` skills for my notes vault, plus a few project-specific deploy skills. They are tied to my own setup, so they are not in this repo.
+**Used a lot, not published here:** a private set of skills for my own note-keeping setup, plus a few project-specific deploy skills. They are tied to my own machine, so they are not in this repo.
 
 ### Install a whole theme at once
 
@@ -139,7 +139,7 @@ What I actually do, as of 2026-09-26. None of it depends on Claude Code specific
 
 **The model tier is chosen at dispatch, and every dispatch names it.** The main thread plans and makes the hard judgement calls. Execution, research and review agents run on the cheaper model, and I do not let a sub-agent inherit the expensive one by omission, because omission is how a research run quietly becomes very expensive. Keep the fan-out small: three or four independent branches usually answer what sixteen agents were sent to answer, and at most two multi-agent runs at once.
 
-**Memory that survives the session.** Skills, hooks and a folder of markdown notes form one loop. Anything expensive to rediscover (a path, a working command, a gotcha, a decision) is written down the moment it is found. A hook loads related notes into each prompt, and another loads the rule line from every past lesson at session start, so a mistake stops across sessions, not only within one. Search is hybrid keyword plus vector, and the index is rebuilt once per task after the last write, never after every note. Automated writers never put files into the searched folder, or stubs bury the real notes.
+**Memory that survives the session.** Skills, hooks and a folder of plain markdown notes form one loop: write down anything expensive to rediscover the moment you find it, and have a hook bring the relevant notes back at the start of the next session. The details of my own version are private.
 
 **Handoffs instead of long sessions.** When work stops midway, `session-handoff` writes a file a cold session can pick up. A long session drifts, and a fresh one with a good handoff does not.
 
@@ -174,7 +174,7 @@ Two lessons. A server being configured is not the same as it being reachable, so
 A hook is a command the agent runs at a fixed point, with no prompting and no remembering. Mine:
 
 - **On every prompt:** search the notes for anything relevant and inject it; load the project's `PROJECT.md`; spot video links so they are ingested rather than skimmed.
-- **On session start:** load the rule line from every past lesson. The highest-value hook I run.
+- **On session start:** load a short list of rules from past mistakes, so the same one is not made twice.
 - **On stop, after every turn:** commit changes to files git already tracks. It never adds new files and it **never pushes**. New files enter history on purpose, and pushing is something I ask for. This is a change from an earlier version that staged everything and pushed: that swept a scraped file into a production merge.
 
 Because that commit is unattended, a secret written into a tracked file is still committed, so secret hygiene has to happen before the turn ends. That is why the pre-push scan exists.
@@ -191,7 +191,7 @@ Keep every hook fast with an explicit timeout, because a hook sits on the critic
 
 ### CLI tools
 
-`gh`, `git-filter-repo`, `qmd` (local markdown search), `ffmpeg` (frame extraction so a screen recording can be reviewed), and `npx gitnexus analyze` to rebuild the code index when it drifts.
+`gh`, `git-filter-repo`, `ffmpeg` (frame extraction so a screen recording can be reviewed), and `npx gitnexus analyze` to rebuild the code index when it drifts.
 
 ## Part of a larger collection
 
