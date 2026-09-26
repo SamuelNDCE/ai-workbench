@@ -37,9 +37,9 @@ particular kind of coding.
 
 ## The techniques
 
-### 1. Rules go in two layers: a short global file and a per-project file that a hook loads
+### 1. Rules go in two layers: a global file and a per-project file that a hook loads
 
-**Do this:** keep one short global instructions file for rules that hold everywhere. Give each
+**Do this:** keep one global instructions file for rules that hold everywhere, and keep it as small as you can. Give each
 project its own `PROJECT.md` for rules that change what you may do in that project: how it deploys,
 what must be true first, what to verify, which environment variables it needs. Load it with
 [`hooks/project-doc-hook.cjs`](../hooks/project-doc-hook.cjs) rather than a line saying "read it".
@@ -55,11 +55,16 @@ written in both places.
 **The rule that keeps the global file short:** a rule set for one project goes in that project's
 file, never the global one.
 
+**An honest caveat:** my own global file is about 64,000 characters, roughly 16,000 tokens, loaded into every
+session. That is too big, and it is the largest fixed cost I have. The rule above is what I aim for, not what
+I have achieved. [docs/token-efficiency.md](token-efficiency.md) shows how to measure yours and what I am
+doing about mine.
+
 Start from [`templates/PROJECT.md`](../templates/PROJECT.md).
 
 ### 2. Every rule is earned by a specific failure
 
-Each line in my global file names the mistake behind it. That is what keeps it short enough to be
+Each line in my global file names the mistake behind it. That keeps each rule specific enough to be
 followed, and it makes the rule easy to challenge later: if the failure cannot recur, the rule can
 go. Add a rule the day something goes wrong, not in advance. Three examples from my own file:
 
