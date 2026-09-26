@@ -1,441 +1,201 @@
-# Claude Workbench
+# AI Workbench
 
-What I actually use to build with Claude Code: skills first, then everything else. The skills below split into two kinds: [Claude Code Skills](https://docs.claude.com/en/docs/claude-code/skills) I've written entirely from scratch (separate from [claude-super-skill-library](https://github.com/SamuelNDCE/claude-super-skill-library), the big curated collection I use but mostly didn't author myself), and the wider set of skills, MCP servers, plugins, hooks, CLI tools, and conventions that make up my day-to-day setup.
+The skills, rules and habits I actually use to build with AI coding agents, ranked by how much I use them. Works with **Claude Code, Codex and Hermes**, and with any other agent that reads `SKILL.md` folders and an `AGENTS.md` file.
 
-If you're here for the parts that changed my output the most, they're near the bottom rather than the top: [hooks](#hooks) and [CLAUDE.md](#how-i-run-claude). Skills get the attention, but a rule that loads on every session and a command that runs whether or not anyone remembers it are what actually compound.
+Every skill is a plain markdown folder: a `SKILL.md` with a `name` and `description`, plus any supporting files. No build step, no dependencies.
 
-Each skill is self-contained: a `SKILL.md` with YAML frontmatter (`name`, `description`) plus any supporting files it needs. Claude Code auto-discovers skills and decides when to invoke one based on its description.
+## Install (2 minutes)
 
-## Contents
+You need `git` and either Git Bash (macOS, Linux, Windows) or PowerShell (Windows).
 
-- [Most Useful Skill](#most-useful-skill)
-- [My Skills](#my-skills)
-  - [Prompt Input](#bundle-prompt-input)
-  - [Multi-Session Task Discipline](#bundle-multi-session-task-discipline)
-  - [Repo & Secret Hygiene](#bundle-repo--secret-hygiene)
-  - [Windows Environment Ops](#bundle-windows-environment-ops)
-  - [Project Content Safety](#bundle-project-content-safety)
-  - [Skill Library Maintenance](#bundle-skill-library-maintenance)
-  - [Personal Workflow Ops](#bundle-personal-workflow-ops)
-- [Skills I Use Most](#skills-i-use-most)
-  - [Tier 1: Top 10](#tier-1-top-10)
-  - [Tier 2: The Next 25](#tier-2-the-next-25)
-  - [Superpowers Plugin](#superpowers-plugin)
-  - [NeuralVault (private)](#neuralvault-private)
-- [Other Stuff](#other-stuff)
-  - [MCP Servers](#mcp-servers)
-  - [Plugins](#plugins)
-  - [Hooks](#hooks)
-  - [Custom Slash Commands](#custom-slash-commands)
-  - [CLI Tools](#cli-tools)
-  - [Standing Conventions](#standing-conventions)
-- [How I Run Claude](#how-i-run-claude)
-- [How to Install](#how-to-install)
-- [Part of a Larger Collection](#part-of-a-larger-collection)
-- [License](#license)
-
-## Most Useful Skill
-
-### `braindump`
-
-If you only take one thing from this whole repo, take this one. It's the skill I use constantly, on nearly every task. Dump whatever's on your mind, as messy and unstructured as it comes out, and it turns that into a clean, structured prompt, shows it to you for a quick sanity check, then runs it. Fires automatically on a raw ramble, no slash command required, or explicitly via `/braindump`.
+**1. Get it.**
 
 ```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-mkdir -p /path/to/your/project/.claude/skills
-cp -r claude-workbench/skills/braindump /path/to/your/project/.claude/skills/
+git clone https://github.com/SamuelNDCE/ai-workbench.git
 ```
 
-It has two sibling tiers for different situations: [`braindump-auto`](skills/braindump-auto/SKILL.md) (skip the confirmation step) and [`superbraindump`](skills/superbraindump/SKILL.md) (for big, tangled, multi-part dumps). Both listed with the rest of the Prompt Input bundle below.
+**2. Install the skills into your agent.** Pick your agent: `claude`, `codex`, `hermes`, or `all`.
 
-## My Skills
-
-20 skills in 7 bundles. Every bundle groups skills that are meant to be installed and used together, and each one below explains why, with a single command to install the whole bundle from a fresh clone. Want just one skill out of a bundle? Clone the repo and copy that one skill's folder yourself, same as any other skill here.
-
-### Bundle: Prompt Input
-
-What it's for: turning a raw, messy prompt into something worth acting on, and catching a specific known failure mode (voice-dictation mishears) along the way. These four are designed as one system, not four separate tools. The three brain-dump tiers share one job (raw dump to clean prompt) at increasing levels of rigor, and the catcher rides shotgun on all three.
+macOS, Linux, Git Bash:
 
 ```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "prompt input"
+./ai-workbench/scripts/install.sh claude
 ```
 
-- [`braindump`](skills/braindump/SKILL.md): my most useful skill, see above. Turns a messy, rambling prompt into a clean, structured one, shows it to you for a quick sanity check, then runs it.
-- [`braindump-auto`](skills/braindump-auto/SKILL.md): the same fix, but skips the confirmation step and runs immediately.
-- [`superbraindump`](skills/superbraindump/SKILL.md): the heavy-duty tier for big, tangled, multi-part dumps. Deeper extraction, a richer prompt template, still shows you the result before running.
-- [`dictation-garble-catcher`](skills/dictation-garble-catcher/SKILL.md): catches a specific braindump blind spot. A word that doesn't fit the sentence and is phonetically close to a real project term (a voice-dictation mishear), confirming the likely correction instead of running with the literal transcription.
+Windows PowerShell:
 
-### Bundle: Multi-Session Task Discipline
+```powershell
+.\ai-workbench\scripts\install.ps1 -Agent claude
+```
 
-What it's for: a pipeline for large work. Plan and split it, isolate each piece, then never take a self-report at face value when it comes back.
+That installs every skill. To install only some, list them after the agent name:
 
 ```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "multi-session task discipline"
+./ai-workbench/scripts/install.sh codex session-handoff verify-dont-trust
 ```
 
-- [`large-task-session-split`](skills/large-task-session-split/SKILL.md): for a large task, draft a plan split into independent pieces and hand each to its own separate session (not a sub-agent) to execute in parallel, instead of one long session accumulating context rot.
-- [`worktree-task-pack-verification`](skills/worktree-task-pack-verification/SKILL.md): isolates each piece in its own git worktree with one independent verifier and a full dual-stack build and test gate before any merge.
-- [`verify-dont-trust`](skills/verify-dont-trust/SKILL.md): the general checklist underneath both. Merge-parent counting instead of trusting "merged cleanly," direct-ID re-fetch instead of trusting a list/edge endpoint, stall detection instead of trusting a "done" claim, post-revert diffing instead of trusting memory.
+```powershell
+.\ai-workbench\scripts\install.ps1 -Agent codex -Skills session-handoff,verify-dont-trust
+```
 
-### Bundle: Repo & Secret Hygiene
+**3. Restart your agent** (or start a new session). Skill lists load at session start.
 
-What it's for: three stages of the same concern, meant to be layered. Prevent on every push, audit everything periodically, and clean up thoroughly if something still gets through.
+**4. Check it worked.** Ask the agent "what skills do you have?" or run `./ai-workbench/scripts/install.sh --list` to see the names available.
+
+To install into one project instead of your whole machine, add `--dest <project>/.claude/skills` (bash) or `-Dest <project>\.claude\skills` (PowerShell).
+
+### Where each agent keeps things
+
+| | Claude Code | Codex | Hermes |
+|:---|:---|:---|:---|
+| **Skills folder** | `~/.claude/skills/<name>/SKILL.md` | `~/.codex/skills/<name>/SKILL.md` | `~/.hermes/skills/` (also scans folders you list under `skills.external_dirs` in its config) |
+| **Standing instructions file** | `CLAUDE.md` | `AGENTS.md` | `AGENTS.md` (also detects `CLAUDE.md`) |
+| **Skill format** | `SKILL.md` with `name` and `description` frontmatter | same | same (follows the agentskills.io open standard) |
+| **MCP servers** | supported | configured in `~/.codex/config.toml` | not checked |
+| **Hooks** | supported (the hooks below are Claude Code hooks) | not checked | not checked |
+| **Install with** | `install.sh claude` | `install.sh codex` | `install.sh hermes` |
+
+How this was checked, 2026-09-26: the Codex row from a local Codex install (a `skills/` folder of `SKILL.md` folders, `AGENTS.md`, and `mcp_servers` in `config.toml`), the Hermes row from its official docs for skills and context files. "Not checked" means I have not verified it, not that it is missing.
+
+If your Hermes lives somewhere else, set `HERMES_HOME` before installing. The same goes for `CLAUDE_HOME` and `CODEX_HOME`.
+
+### One instructions file for every agent
+
+Write your rules once in `AGENTS.md`, then make Claude Code read it too. Create a `CLAUDE.md` containing one line:
+
+```
+@AGENTS.md
+```
+
+Now Codex and Hermes read `AGENTS.md` directly, and Claude Code pulls it in through `CLAUDE.md`. One file to maintain.
+
+### What will and will not carry over
+
+The skills are instructions in markdown, so they work in any agent that can read a file and follow it. Two name tools that only exist in Claude Code: `repo-hygiene` (a GitHub MCP tool name) and `windows-process-restart` (a task-stop tool). In another agent those steps become "do the equivalent with whatever you have". A few others mention `CLAUDE.md` or `~/.claude/skills/` in passing (`capability-claim-grounding`, `dictation-garble-catcher`, `superbraindump`): read those as `AGENTS.md` and your agent's skills folder.
+
+## The skills, most used to least used
+
+Counts are how many times each skill was invoked by name in my Claude Code session transcripts touched in the last 45 days (to 2026-09-26). Skills that fire from a hook or a slash command can be undercounted, and Codex and Hermes usage is not in these numbers. "Here" means the skill is in this repo's `skills/` folder.
+
+| # | Skill | Uses | What it does | Where |
+|--:|:---|--:|:---|:---|
+| 1 | `session-handoff` | 91 | Writes a self-contained file so a cold session can resume tomorrow, or another session can take over now. Also resumes from one. | **Here** |
+| 2 | `superbraindump` | 56 | For a big, tangled, multi-part ramble: turns it into a rigorous prompt, confirms it, runs it. One of the skills I reach for when I cannot be bothered to write a prompt. | **Here** |
+| 3 | `brainstorming` | 39 | Explores what you actually want before any building starts. | [Superpowers](https://github.com/obra/superpowers) |
+| 4 | `dictation-garble-catcher` | 36 | Catches a voice-dictation mishear that sounds like a real project term and confirms it instead of running with the wrong word. | **Here** |
+| 5 | `braindump` | 31 | The lighter version of #2: messy ramble in, clean prompt out, quick confirm, run. | **Here** |
+| 6 | `design-review-loop` | 24 | Do a big batch of UI changes alone, check them yourself, then hand back one numbered walkthrough of what to look at. | **Here** |
+| 7 | `systematic-debugging` | 21 | A structured approach before proposing any fix. | [Superpowers](https://github.com/obra/superpowers) |
+| 8 | `pre-push-secret-scan` | 20 | A fast key, token and webhook scan before every `git push`. | **Here** |
+| 9 | `karpathy-guidelines` | 19 | Guardrails against over-engineering and unrequested scope. | [Library](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/misc-utilities/karpathy-guidelines/SKILL.md) |
+| 10 | `claude-api` | 16 | Current reference for the Anthropic API and SDKs. | Built into Claude Code |
+| 11 | `writing-plans` | 14 | Turns a spec into a step-by-step plan before touching code. | [Superpowers](https://github.com/obra/superpowers) |
+| 12 | `capability-claim-grounding` | 13 | Proves every claim in public copy (a feature, a price, a comparison) against the real build before it is written. | **Here** |
+| 13 | `artifact-design` | 13 | Design fundamentals for a published HTML page. | Built into Claude Code |
+| 14 | `security-review` | 10 | Security review of the pending changes on a branch. | Built into Claude Code |
+| 15 | `supabase-postgres-best-practices` | 9 | Postgres schema, RLS, index and query rules. | Supabase's own skill |
+| 16 | `supabase` | 8 | Anything touching Supabase: auth, RLS, edge functions, migrations. | Supabase's own skill |
+| 17 | `run` | 7 | Launch and drive the app to see a change actually working. | Built into Claude Code |
+| 18 | `update-config` | 6 | Change agent settings, hooks and permissions safely. | Built into Claude Code |
+| 19 | `subagent-driven-development` | 6 | Execute independent plan tasks with sub-agents in one session. | [Superpowers](https://github.com/obra/superpowers) |
+| 20 | `braindump-auto` | 5 | Same as `braindump` but skips the confirmation step. | **Here** |
+| 21 | `verify-dont-trust` | 4 | Never accept a self-report as proof: re-check by a different route before marking anything done. | **Here** |
+| 22 | `ui-change-visual-verify` | 4 | Screenshot every section you changed. Catches global selectors silently restyling a new component. | **Here** |
+| 23 | `project-design-doc` | 4 | A persistent per-project design spec that is followed automatically. | **Here** |
+| 24 | `repo-hygiene` | 4 | Cleans proven-junk files and makes every new repo private by default. | **Here** |
+| 25 | `safe-section-deletion` | 3 | Search the whole codebase for references before deleting a section or symbol. | **Here** |
+| 26 | `zombie-process-sweep` | 1 | Finds and kills orphaned dev servers and watchers at the end of a session. | **Here** |
+| 27 | `windows-shell-tool-selection` | 1 | When to use Bash versus PowerShell on Windows, and the syntax traps between them. | **Here** |
+| 28 | `derived-figure-audit` | 0 | Re-derives every computed figure in a document from its source so the numbers agree. | **Here** |
+| 28 | `full-account-security-audit` | 0 | Periodic full audit: every repo, full history, `.env` files, secret-scanning alerts. | **Here** |
+| 28 | `public-repo-leak-retraction` | 0 | Cleanup when a secret already got out: scrub, rewrite history, force-push, verify. | **Here** |
+| 28 | `large-task-session-split` | 0 | Split a big task into independent pieces, one fresh session each. | **Here** |
+| 28 | `worktree-task-pack-verification` | 0 | One git worktree and one independent verifier per piece, full gate before any merge. | **Here** |
+| 28 | `windows-process-restart` | 0 | Safely restart a supervised Windows background process with real verification. | **Here** |
+| 28 | `skill-overlap-audit` | 0 | Finds near-duplicate skills in a library. | **Here** |
+| 28 | `repo-index-drift-check` | 0 | Checks a hub repo's claimed counts against what the linked repos contain now. | **Here** |
+| 28 | `personal-dashboard-style` | 0 | A fixed dark HTML report style instead of a new look each time. | **Here** |
+| 28 | `discord-todo-ops` | 0 | Wraps a Discord reaction-based shared todo list into one skill. | **Here** |
+
+Rows marked 0 were not invoked in this window. Some are insurance skills you want to exist and never call often (leak retraction, full audits), and some I have simply outgrown. They stay because they still work.
+
+**Used a lot, not published here:** a private set of about two dozen `nv-*` skills for my notes vault, plus a few project-specific deploy skills. They are tied to my own setup, so they are not in this repo.
+
+### Install a whole theme at once
+
+The older bundle installer still works. Each bundle installs skills that belong together:
 
 ```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "repo and secret hygiene"
+./ai-workbench/scripts/install-group.sh "everyday workflow"
 ```
 
-- [`pre-push-secret-scan`](skills/pre-push-secret-scan/SKILL.md): a fast key/token/webhook scan before every `git push`. The automatic, everyday layer.
-- [`full-account-security-audit`](skills/full-account-security-audit/SKILL.md): the comprehensive, periodic version. Every local repo, every GitHub repo, full git history, local `.env` files, GitHub's own secret-scanning alerts.
-- [`public-repo-leak-retraction`](skills/public-repo-leak-retraction/SKILL.md): reactive cleanup when something already got through the first two. Scrubs current files, rewrites git history with `git-filter-repo`, force-pushes, verifies zero-trace via GitHub code search.
-- [`repo-hygiene`](skills/repo-hygiene/SKILL.md): cleans up proven-junk stray files (a known Git-Bash bug) and defaults every new repo to private, without ever guessing at what counts as junk.
+Run it with no arguments to print every bundle name. It installs into `./.claude/skills` unless you pass a destination as the second argument.
 
-### Bundle: Windows Environment Ops
+## How I use Claude Code now
 
-What it's for: the two most common ways a Windows Claude Code session goes sideways. A zombie process nobody stopped, and a shell-syntax trap between Bash and PowerShell.
+What I actually do, as of 2026-09-26. None of it depends on Claude Code specifically, but the hooks do.
 
-```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "windows environment ops"
-```
+**Standing rules live in a short global `CLAUDE.md`, and each project has its own `PROJECT.md`.** The global file holds rules earned from specific failures, each short enough to get followed. The per-project file holds what changes what you are allowed to do right now: how to deploy and what must be true first, which environment variables must exist, what to verify before claiming something works. A hook injects the project's file into every session, so it applies whether or not anyone remembered to open it. Every new project gets its `PROJECT.md` (and a `DESIGN.md` if it has a UI) before real work starts, and both are updated in the same commit as the change they describe.
 
-- [`zombie-process-sweep`](skills/zombie-process-sweep/SKILL.md): finds and safely kills orphaned dev servers/watchers left running, instead of relying on memory to stop what you started.
-- [`windows-shell-tool-selection`](skills/windows-shell-tool-selection/SKILL.md): a cheat sheet for when to use a Bash tool vs. a PowerShell tool on Windows, and the specific syntax traps between them (chaining, heredocs, encoding).
-- [`windows-process-restart`](skills/windows-process-restart/SKILL.md): safely restarts a supervised Windows background process (kills the child, not the supervisor) with real PID-level verification.
+**The model tier is chosen at dispatch, and every dispatch names it.** The main thread plans and makes the hard judgement calls. Execution, research and review agents run on the cheaper model, and I do not let a sub-agent inherit the expensive one by omission, because omission is how a research run quietly becomes very expensive. Keep the fan-out small: three or four independent branches usually answer what sixteen agents were sent to answer, and at most two multi-agent runs at once.
 
-### Bundle: Project Content Safety
+**Memory that survives the session.** Skills, hooks and a folder of markdown notes form one loop. Anything expensive to rediscover (a path, a working command, a gotcha, a decision) is written down the moment it is found. A hook loads related notes into each prompt, and another loads the rule line from every past lesson at session start, so a mistake stops across sessions, not only within one. Search is hybrid keyword plus vector, and the index is rebuilt once per task after the last write, never after every note. Automated writers never put files into the searched folder, or stubs bury the real notes.
 
-What it's for: two different angles on not shipping a design or content change that quietly breaks something else.
+**Handoffs instead of long sessions.** When work stops midway, `session-handoff` writes a file a cold session can pick up. A long session drifts, and a fresh one with a good handoff does not.
 
-```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "project content safety"
-```
+**Check before you claim.** A fact gets verified from a primary source before I say it, especially in fast-moving areas like pricing, APIs, model names and law. Before advising on a one-way step (a delete, a config choice, a game event), I find the exact page that governs that step, not an adjacent one that mentions it. For a chain of steps, I read where the chain ends, not just what the next click does. A session does not grade its own work: something separate checks it.
 
-- [`project-design-doc`](skills/project-design-doc/SKILL.md): maintains a persistent per-project design spec (colors, timing conventions, layout patterns) and follows it automatically on future design requests, instead of re-deriving or re-asking every time.
-- [`safe-section-deletion`](skills/safe-section-deletion/SKILL.md): greps the whole codebase for references before deleting any HTML section, anchor, or exported symbol. The markup/id-level sibling of call-graph impact analysis.
+**Answer in chat first.** A comparison, a ranking, a plan, a status: chat. A file only when the shape of the data is the point (a trend, a network, something someone will return to). When I do build an HTML page, anything that carries meaning gets a consistent colour and a text label as well, so it survives greyscale, a screenshot and colour blindness.
 
-### Bundle: Skill Library Maintenance
+**Web tools, cheapest first.** A plain fetch for static pages, a real browser only for pages that need JavaScript, a screenshot only when the look itself is the question. A screenshot costs roughly seventy times a text read.
 
-What it's for: keeping a large skill collection, or any repo that indexes other repos, honest about what it actually contains.
+**Commands I hand to a person are checked against their shell first.** If someone is on Windows PowerShell 5.1, there is no `&&`. One command per block, run once before handing it over.
 
-```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "skill library maintenance"
-```
+**Pace is a spoken setting.** Slow and sequential by default. Saying "fast" lets sub-agents be used more readily, and it resets after each task.
 
-- [`skill-overlap-audit`](skills/skill-overlap-audit/SKILL.md): finds near-duplicate or overlapping skills in a library and recommends what to merge or retire.
-- [`repo-index-drift-check`](skills/repo-index-drift-check/SKILL.md): audits a hub/index repo's claimed counts and descriptions against what the linked repos actually contain right now.
+**Three strikes and it becomes a skill.** The same kind of task done three times across sessions gets a skill, not a note, so the next session picks it up without being told. A skill that exists but is switched off counts as not created, so I check that it actually loads.
 
-### Bundle: Personal Workflow Ops
-
-What it's for: two personal conventions worth automating rather than re-deriving each time.
-
-```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "personal workflow ops"
-```
-
-- [`personal-dashboard-style`](skills/personal-dashboard-style/SKILL.md): applies a fixed dark-theme HTML report convention (colors, save path, auto-open, always-paired summary) instead of inventing a new visual style per report.
-- [`discord-todo-ops`](skills/discord-todo-ops/SKILL.md): wraps a reaction-based, Discord-backed shared todo list (script-driven add/edit, Discord-native accept/complete) into one skill instead of remembering three separate invocations.
-
-Plus 24 personal NeuralVault (`nv-*`) skills built for my own second-brain workflow. Hidden for now, coming soon.
-
-## Skills I Use Most
-
-A ranking across everything, mine and everyone else's. Sections below cover the ones not written by me in more depth; anything pulled up here from one of those sections is tagged with where it actually lives.
-
-### Tier 1: Top 10
-
-The ten I'd keep if I had to drop everything else.
-
-1. [`karpathy-guidelines`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/misc-utilities/karpathy-guidelines/SKILL.md): behavioral guardrails against over-engineering and unrequested scope, built on Andrej Karpathy's original LLM-coding pitfalls
-2. [`braindump`](skills/braindump/SKILL.md) (mine): the single most-used skill in the whole setup, see the top of this README
-3. [`gitnexus-impact-analysis`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/code-intelligence/gitnexus/gitnexus-impact-analysis/SKILL.md): blast-radius check before editing any symbol
-4. [`para-second-brain`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/knowledge-vault-ops/para-second-brain/SKILL.md): PARA-method second-brain organization
-5. [`git-workflow`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/misc-utilities/git-workflow/SKILL.md): branching strategies, commit conventions, merge vs. rebase
-6. [`verification-loop`](https://github.com/affaan-m/everything-claude-code): verify a change actually works before calling it done
-7. [`verify-dont-trust`](skills/verify-dont-trust/SKILL.md) (mine): the checklist behind most of the verification habits on this whole list
-8. `nv-agent-brief` (NeuralVault): pulls all relevant prior context from the vault before starting any non-trivial task
-9. `nv-web-search` (NeuralVault): web search that saves results straight into the vault, tagged and routed automatically
-10. [`verification-before-completion`](https://github.com/obra/superpowers/blob/main/skills/verification-before-completion/SKILL.md) (superpowers): confirms work actually meets requirements before calling it done
-
-### Tier 2: The Next 25
-
-Everything else in regular rotation, by category.
-
-**Code intelligence:**
-- [`gitnexus-exploring`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/code-intelligence/gitnexus/gitnexus-exploring/SKILL.md): trace execution flows and architecture in unfamiliar code
-- [`gitnexus-debugging`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/code-intelligence/gitnexus/gitnexus-debugging/SKILL.md): trace a bug to its root cause via the call graph
-- [`gitnexus-refactoring`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/code-intelligence/gitnexus/gitnexus-refactoring/SKILL.md): safe rename/extract/split with call-graph awareness
-- [`codebase-onboarding`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/code-intelligence/codebase-onboarding/SKILL.md): structured onboarding guide with architecture map
-- [`repo-scan`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/code-intelligence/repo-scan/SKILL.md): cross-stack source audit, classifies every file
-
-**Workflow and meta:**
-- [`tdd-workflow`](https://github.com/affaan-m/everything-claude-code): disciplined test-first workflow instead of ad hoc test-after
-- [`prompt-optimizer`](https://github.com/affaan-m/everything-claude-code): tightens and evaluates prompts for reuse
-- [`security-scan`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/security-review/security-scan/SKILL.md): scan a `.claude/` config for vulnerabilities and misconfigurations
-- [`terminal-ops`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/devops-infra/terminal-ops/SKILL.md): evidence-first repo execution workflow
-- [`deep-research`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/knowledge-vault-ops/deep-research/SKILL.md): multi-source research with cited reports
-- [`qmd`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/knowledge-vault-ops/qmd/SKILL.md): search local markdown knowledge bases and wikis
-
-**Dev patterns:**
-- [`database-migrations`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/devops-infra/database-migrations/SKILL.md): schema changes, rollbacks, zero-downtime deployments
-- [`deployment-patterns`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/language-frameworks/deployment-patterns/SKILL.md): CI/CD, containerization, health checks, rollback strategies
-- [`error-handling`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/misc-utilities/error-handling/SKILL.md): typed errors, retries, and circuit breakers
-- [`api-design`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/misc-utilities/api-design/SKILL.md): REST resource naming, status codes, pagination, versioning
-- [`mcp-server-patterns`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/agent-ai-engineering/mcp-server-patterns/SKILL.md): build MCP servers with the Node/TypeScript SDK
-- [`rust-patterns`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/language-frameworks/rust-patterns/SKILL.md): idiomatic Rust ownership, error handling, concurrency
-- [`python-patterns`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/language-frameworks/python-patterns/SKILL.md): Pythonic idioms, PEP 8, type hints
-
-**Frontend and design:**
-- [`frontend-patterns`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/frontend-design-ui/frontend-patterns/SKILL.md): React/Next.js state management and performance
-- [`accessibility`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/frontend-design-ui/accessibility/SKILL.md): WCAG 2.2 AA inclusive design for web and native
-- [`motion-foundations`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/frontend-design-ui/motion-foundations/SKILL.md): motion tokens, spring presets, SSR-safe animation
-- [`motion-patterns`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/frontend-design-ui/motion-patterns/SKILL.md): production-ready animation patterns for buttons and modals
-- [`make-interfaces-feel-better`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/frontend-design-ui/make-interfaces-feel-better/SKILL.md): concrete polish details, spacing, motion, hit areas
-- [`click-path-audit`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/frontend-design-ui/click-path-audit/SKILL.md): trace every button's state changes to find silent cancel-out bugs
-- [`browser-qa`](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/frontend-design-ui/browser-qa/SKILL.md): automate visual testing and UI verification after deploys
-
-### Superpowers plugin
-
-14 skills bundled with the [Superpowers](https://github.com/obra/superpowers) plugin, all in regular use:
-
-- [`using-superpowers`](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md): how skills get discovered and invoked in the first place
-- [`brainstorming`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md): explores intent and requirements before any creative or building work
-- [`writing-plans`](https://github.com/obra/superpowers/blob/main/skills/writing-plans/SKILL.md): turns a spec into a multi-step plan before touching code
-- [`executing-plans`](https://github.com/obra/superpowers/blob/main/skills/executing-plans/SKILL.md): runs a written plan in a separate session with review checkpoints
-- [`dispatching-parallel-agents`](https://github.com/obra/superpowers/blob/main/skills/dispatching-parallel-agents/SKILL.md): dispatches independent tasks with no shared state to run in parallel
-- [`subagent-driven-development`](https://github.com/obra/superpowers/blob/main/skills/subagent-driven-development/SKILL.md): executes independent plan tasks within the current session
-- [`using-git-worktrees`](https://github.com/obra/superpowers/blob/main/skills/using-git-worktrees/SKILL.md): isolated workspaces for feature work before executing a plan
-- [`systematic-debugging`](https://github.com/obra/superpowers/blob/main/skills/systematic-debugging/SKILL.md): a structured approach before proposing any fix
-- [`test-driven-development`](https://github.com/obra/superpowers/blob/main/skills/test-driven-development/SKILL.md): strict test-first discipline
-- [`verification-before-completion`](https://github.com/obra/superpowers/blob/main/skills/verification-before-completion/SKILL.md): confirms work actually meets requirements before calling it done
-- [`requesting-code-review`](https://github.com/obra/superpowers/blob/main/skills/requesting-code-review/SKILL.md): verifies work meets requirements before merging
-- [`receiving-code-review`](https://github.com/obra/superpowers/blob/main/skills/receiving-code-review/SKILL.md): processes incoming review feedback
-- [`finishing-a-development-branch`](https://github.com/obra/superpowers/blob/main/skills/finishing-a-development-branch/SKILL.md): structured options for merging, opening a PR, or cleaning up
-- [`writing-skills`](https://github.com/obra/superpowers/blob/main/skills/writing-skills/SKILL.md): the meta-skill for building new skills, the one behind most of this repo
-
-### NeuralVault (private)
-
-24 personal skills for my own second-brain workflow. Named here, not published:
-- `nv-web-search`: web search that saves results straight into the vault, tagged and routed automatically
-- `nv-video-ingest`: point it at a video link, it saves a structured note
-- `nv-cross-linker`: links related notes together as new ones get added
-- `nv-daily-brief` and `nv-weekly-review`: digests of what changed and what needs attention
-- `nv-vault-audit`: finds orphaned or contradictory notes
-
-## Other Stuff
-
-Not skills, but the rest of the setup that makes the skills above actually work.
+## Setup beyond skills
 
 ### MCP servers
 
-Grouped by what they're for. Not all are on at once.
+MCP is a shared standard, so the same servers can be used from any agent that supports it. Not all are on at once.
 
-**Code intelligence**
-- **GitNexus**: call-graph-aware code intelligence, the backbone of the code-intelligence skills above. Impact analysis, symbol context, execution flows, safe renames.
-- **CodeGraph**: a second graph index, wired through a small local bridge server that caches every result into my notes vault, so a lookup done once doesn't get paid for twice.
+- **GitNexus:** call-graph code intelligence: impact analysis, symbol context, safe renames. Check the index age before trusting it.
+- **GitHub, Supabase, Stripe, Vercel, Figma, Shopify Dev, Grafana:** the service each one names, without shelling out for everything.
+- **Context7:** current library docs on demand instead of answering from stale training data.
+- **Desktop Commander:** persistent shells, long processes, structured local files.
+- **My own two web servers:** one for search and static page reads, one that drives a real browser for JavaScript pages and screenshots. Private for now.
 
-**Knowledge and research**
-- **qmd**: local search across my markdown vault, hybrid keyword plus vector. The retrieval layer under most of the `nv-*` skills.
-- **nv-web**: a local server of my own for web search, read, and extract, wired so every result can be saved into the vault automatically by a hook.
-- **Context7**: current library and framework docs on demand, instead of answering API questions out of stale training data.
+Two lessons. A server being configured is not the same as it being reachable, so confirm a tool actually resolves before building on it. And a config file will happily list a server that has been dead for months.
 
-**Repo and infrastructure**
-- **GitHub**: repo, PR, and issue operations without shelling out to `gh` for everything.
-- **Supabase**: database inspection, migrations, advisors, and log reads for Postgres-backed projects.
-- **Desktop Commander**: persistent shells and REPLs, long-running processes, and structured local files (spreadsheets, PDFs, large CSVs).
+### Hooks (Claude Code)
 
-**Browser and design**
-- **Playwright**: scripted browser automation for checks that need to be repeatable.
-- **Figma**: reads designs into code and pushes code back into Figma.
-- **Shopify Dev**: schema-validated GraphQL and theme checks for storefront work.
+A hook is a command the agent runs at a fixed point, with no prompting and no remembering. Mine:
 
-Two things I learned the hard way here. A server being configured is not the same as it being reachable, so confirm a tool actually resolves before building a workflow on top of it. And a config file will happily declare a server that has been dead for months without anything warning you.
+- **On every prompt:** search the notes for anything relevant and inject it; load the project's `PROJECT.md`; spot video links so they are ingested rather than skimmed.
+- **On session start:** load the rule line from every past lesson. The highest-value hook I run.
+- **On stop, after every turn:** commit changes to files git already tracks. It never adds new files and it **never pushes**. New files enter history on purpose, and pushing is something I ask for. This is a change from an earlier version that staged everything and pushed: that swept a scraped file into a production merge.
+
+Because that commit is unattended, a secret written into a tracked file is still committed, so secret hygiene has to happen before the turn ends. That is why the pre-push scan exists.
+
+Keep every hook fast with an explicit timeout, because a hook sits on the critical path of every session. Write hooks for the things you keep forgetting, not the things you already do reliably.
+
+### Slash commands
+
+`/fix-linter` (work through linter output systematically), `/review-recent` (review only what changed recently), `/visual-plan` (turn a text plan into a visual one).
 
 ### Plugins
 
-Plugins bundle skills, commands, agents, and hooks together and install from a marketplace, instead of copying files one at a time. The ones I keep switched on:
-
-- [**Superpowers**](https://github.com/obra/superpowers): the process layer, 14 skills, broken out in its own section above.
-- [**Impeccable**](https://github.com/pbakaus/impeccable): frontend and interface design review, from visual hierarchy through accessibility to motion.
-- [**taste-skill**](https://github.com/leonxlnx/taste-skill): a set of opinionated visual directions to pick from, instead of defaulting to the same look every time.
-- [**claude-obsidian**](https://github.com/AgriciDaniel/claude-obsidian): wiki-style vault ingestion, linting, and querying, with its own sub-agents.
-- **claude-md-management**: audits and improves `CLAUDE.md` files, which matters more than it sounds like. See below.
-- **hookify**: writes hooks for me by reading back over a session and spotting a behaviour worth preventing automatically.
-- **security-guidance**: security review patterns for auth, user input, secrets, and endpoints.
-- **context7**: the docs server above, shipped as a plugin.
-
-### Hooks
-
-The part of the setup I'd have the most trouble giving up, and the part that gets talked about least. A hook is a command Claude Code runs automatically at a fixed point in a session. No prompting, no remembering, no way to forget. Mine do this:
-
-**On every prompt I send.** One hook searches my notes vault for anything relevant to what I just asked and injects it before Claude sees the prompt. A second spots video links so they get properly ingested rather than skimmed.
-
-**On session start.** Every lesson I've written up after something went wrong loads as a short rule list. This is the highest-value hook I run by a wide margin. It's the difference between mistakes stopping within a session and mistakes stopping across sessions.
-
-**On session end.** The session gets summarized and written back to the vault, which is what feeds the two hooks above next time round.
-
-**On stop, after every single turn.** Any repo with a remote gets staged, committed, and pushed. I never lose work and I never have to ask for a commit. The trade is real and worth stating plainly: nothing can be left in a working tree "for review," so secret hygiene has to happen before a turn ends rather than before a manual push. That constraint is exactly why the repo and secret hygiene bundle above exists.
-
-**Around tool calls.** Searches get enriched with call-graph context from the code index, and the index gets checked for staleness after shell commands, so a stale answer gets caught instead of trusted.
-
-Two rules I'd pass on. Keep every hook fast and give it an explicit timeout, because a hook sits on the critical path of your session. And write hooks for the things you keep forgetting, not the things you already do reliably.
-
-### Custom slash commands
-
-Small, one file each, for things worth invoking by name rather than describing again every time:
-- `/fix-linter`: work through linter output systematically instead of ad hoc.
-- `/review-recent`: review only what changed recently, rather than a whole repo.
-- `/visual-plan`: turn a text plan into a visual one with diagrams and file maps.
+[Superpowers](https://github.com/obra/superpowers) (the process layer), [Impeccable](https://github.com/pbakaus/impeccable) (interface design review), [taste-skill](https://github.com/leonxlnx/taste-skill) (opinionated visual directions), [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) (vault ingestion and linting), plus `claude-md-management`, `hookify` and `security-guidance`.
 
 ### CLI tools
 
-- `gh` (GitHub CLI): repo creation, PR management, API calls
-- `git-filter-repo`: history rewrites, see [`public-repo-leak-retraction`](skills/public-repo-leak-retraction/SKILL.md) above
-- `qmd`: local markdown knowledge-base search, also listed as a skill and an MCP server above
-- `agent-browser`: browser automation for verifying UI changes actually work
-- `ffmpeg`: frame extraction, so a screen recording can actually be reviewed instead of described
-- `npx gitnexus analyze`: rebuilds the code index when it drifts behind the commit log
-
-### Standing conventions
-
-- Dark navy/teal/purple HTML report style for anything data-heavy, see [`personal-dashboard-style`](skills/personal-dashboard-style/SKILL.md) above
-- A Discord-based shared team todo list and activity log, see [`discord-todo-ops`](skills/discord-todo-ops/SKILL.md) above
-- Charts and diagrams render from a vendored offline bundle rather than a CDN tag, so a report still works offline and under a strict content policy
-
-## How I Run Claude
-
-Workflow patterns, not skills or tools, kept high-level on purpose.
-
-**CLAUDE.md is the main lever**
-
-Ranked by how much output it changes per minute spent writing it, nothing else in this repo comes close. A `CLAUDE.md` is a file of standing instructions that loads into every session automatically, one global and one per project.
-
-Mine is not a description of my projects. It's a list of rules earned from specific failures, each short enough to actually get followed. The ones that pull the most weight:
-
-- Verify before asserting. Never answer a factual question from memory, especially anywhere fast-moving: pricing, APIs, model names, tool behaviour, law. Confidence is not evidence, and feeling sure is the exact condition under which this rule gets skipped.
-- Never hardcode machine-specific absolute paths. This broke three separate projects before it became a rule.
-- Never bake a volatile number into an instruction file. State how to obtain a count, never the count itself, or date-stamp it as a snapshot. Counts rot within days and then read as authoritative.
-- Stop every background process the moment its task is done.
-- Reason before acting. Surface concerns before executing, not after.
-
-The per-project file does a different job: it documents the traps. Which entry points are broken and why, which directories look like source but aren't, what a repo-wide search will silently get wrong. A fresh session reads it and skips an entire class of wasted effort.
-
-Keeping it honest matters as much as writing it. A rule that has quietly become false is worse than no rule at all, so I audit the file rather than only adding to it.
-
-**Memory that survives the session**
-
-Skills, hooks, and a notes vault form one loop. Something learned in a session gets written to the vault, a hook loads the relevant parts back at the start of the next one, and a lesson written up after a mistake becomes a rule injected at every session start from then on.
-
-The important half is the discipline, not the tooling: write it down at the moment of discovery, not at the end of the task. Anything that would cost real time to rediscover, a path, a working command, a gotcha, a decision, goes in immediately.
-
-Where it gets written matters as much as whether it does. Entries route by topic into separate logs rather than piling into one file, and a session that spanned three subjects gets split across three logs instead of dumped into whichever one felt closest. A single growing log is easy to write and useless to search later.
-
-**Pace is a spoken setting**
-
-Slow and sequential by default. One thing at a time, no fanning out unless the work genuinely calls for it. Saying "fast" flips it: sub-agents get reached for more readily, though they still have to earn it rather than getting spawned over something trivial. It resets to slow after each task, so speed is something opted into deliberately per task, never a mode left running by accident.
-
-Worth having as an explicit switch because parallelism carries a coordination cost that stays invisible until it bites. Making "go faster" a thing said out loud keeps that cost a decision instead of a default.
-
-**Large tasks**
-
-A big project starts in one session: that session plans the work and splits it into independent pieces. Each piece then goes to its own fresh session running in parallel, each in its own git worktree so nothing collides on the same files. This is cheaper in tokens than nesting a dozen sub-agents inside one conversation, and it sidesteps the quality drop that comes from a single session dragging on too long.
-
-If several of those sessions are going to hit something expensive at the same time, a full build, for example, that one step runs through a shared lock so they queue instead of fighting over the same resources.
-
-Before fanning out into parallel sessions or sub-agents at all, it's worth asking whether the task is actually big enough to justify the coordination cost. A one-line fix doesn't need a swarm behind it.
-
-**Trust, but check**
-
-A session doesn't get to grade its own work. Something separate, with no stake in the outcome, checks the result instead of taking a self-report at face value. The same applies to facts: a count or a claim about what exists gets checked directly rather than trusted from a cache or a tool's last answer.
-
-**Check the tool before trusting the tool**
-
-A code index, a cache, or a graph database will answer confidently while being months out of date, and usually nothing in the output says so. So the staleness check comes before the question: how far behind the index is, when it was last built. If it's stale, the choice is rebuild it or say plainly that the analysis was skipped. What doesn't happen is presenting an old answer as a current one.
-
-The same instinct applies to the mechanical steps everyone assumes are safe. A scripted commit can mangle its own message through a quoting bug and still exit successfully, so the message gets read back afterwards. A clean `git status` can mean an automation already committed, not that nothing changed. Neither of those failures announces itself.
-
-**Prompts**
-
-Messy asks get rewritten first, goal, context, constraints, done-when, before anything actually runs. This matters most for anything that touches multiple files or spans more than one session.
-
-**Sub-agents and model tiering**
-
-Different models for different jobs, picked at dispatch rather than set once and forgotten. Reading, scanning, and extracting across many documents goes to Haiku on a cheap reader agent that can read but never edit. Web research starts on Haiku and moves up to Sonnet when the sources are dense or the synthesis needs real judgment. Coding and multi-step tool chains inherit Sonnet, with Opus reserved for genuinely hard problems.
-
-Two things make this work in practice. The tier gets announced out loud at dispatch, so a bad choice is visible and easy to spot-check instead of buried inside a tool call. And a large fan-out runs in waves, with each agent writing its result to its own file, so after every wave I can check which files actually exist rather than assuming every agent succeeded. A missing file is a failure to retry, never a silent "done."
-
-**Wasting less time per task**
-
-Small habits, and they compound harder than any one of them suggests:
-
-- Independent reads, greps, and status checks go out in a single batch instead of one at a time.
-- Anything expected to take more than about twenty seconds runs in the background, and the context for the next step gets read while it runs.
-- Never sleep-poll. Wait for the completion signal rather than looping on a timer, and make one-off scripts exit cleanly instead of leaving a timer open behind them.
-- Never re-run a slow command whose output is already sitting in the conversation. If it will be needed again later, it goes to a scratch file.
-- Verification of one step can run in the background while the next step starts, as long as nothing builds on a result that hasn't been verified yet. Writes stay strictly sequential.
-- Every background process gets stopped when its task is done, rather than whenever someone notices it still running.
-
-**Render it, don't print it**
-
-Anything visual or data-heavy, a report, a comparison, more than roughly ten rows, becomes a self-contained HTML file in a fixed house style instead of a wall of terminal text. There's always a short text summary alongside it, so nothing important depends on actually opening the file.
-
-Two browsers doing two jobs, kept deliberately separate. Anything meant for me to look at opens in my real browser. Anything the agent needs for verification, screenshots, DOM checks, runs in a separate automation browser. Collapsing the two means either I get a screenshot when I wanted a page, or an agent starts driving the browser I'm logged into everything on.
-
-**Keep a written profile of how you want to be worked with**
-
-Separate from any project rules, I keep a note describing how I like to be worked with: how much detail I want, how I prefer things explained, what I've reacted badly to before. It gets read before anything substantial and updated whenever something new gets learned about how I work.
-
-This sounds soft and isn't. Preferences that live only inside a conversation die with that conversation, and the next session re-learns them by getting it wrong first.
-
-**Three strikes and it becomes a skill**
-
-Once the same kind of task has been done three times across sessions, it stops being something I explain each time and becomes a skill. Not a note, a skill, so the next session picks it up on its own without me remembering to mention it. A running file of repeat patterns makes the third occurrence visible, rather than leaving it to whether I happen to notice.
-
-**Where skills actually live**
-
-Worth understanding before you trust that a skill is running at all. A skill can exist on disk, be committed, and still never load. Skills come from several places at once (project, user, plugins), activation is often a symlink rather than the file itself, and a settings file can switch any of them off individually. A skill that exists but is disabled counts as not created, so after writing one I confirm it actually loads instead of assuming it does.
-
-## How to install
-
-**A single skill.** Clone the repo, then copy the one folder you want:
-```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-mkdir -p /path/to/your/project/.claude/skills
-cp -r claude-workbench/skills/<skill-name> /path/to/your/project/.claude/skills/
-```
-
-**A whole bundle by name.** Type the bundle name (spaces, hyphens, and `&`/`and` are all interchangeable, case doesn't matter):
-```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cd claude-workbench
-./scripts/install-group.sh "<bundle name>" [destination]
-```
-Run `./scripts/install-group.sh` with no arguments to print the full list of bundle names.
-
-**The whole repo:**
-```bash
-git clone https://github.com/SamuelNDCE/claude-workbench.git
-cp -r claude-workbench/skills/* /path/to/your/project/.claude/skills/
-```
-
-Restart Claude Code (or start a new session) after adding skills. The skill list loads at session start.
+`gh`, `git-filter-repo`, `qmd` (local markdown search), `ffmpeg` (frame extraction so a screen recording can be reviewed), and `npx gitnexus analyze` to rebuild the code index when it drifts.
 
 ## Part of a larger collection
 
-See [toolkit](https://github.com/SamuelNDCE/toolkit) for the full index of published tools, and [claude-super-skill-library](https://github.com/SamuelNDCE/claude-super-skill-library) for the full 287-skill collection. Five of the twenty skills I wrote from scratch (`braindump`, `braindump-auto`, `superbraindump`, `windows-process-restart`, `repo-hygiene`) are also featured there. The other fifteen, plus everything in the "Skills I Use Most," "Other Stuff," and "How I Run Claude" sections, are specific to this repo.
+See [toolkit](https://github.com/SamuelNDCE/toolkit) for the index of published tools and [claude-super-skill-library](https://github.com/SamuelNDCE/claude-super-skill-library) for the larger curated skill collection. This repo was called `claude-workbench` until 2026-09-26. GitHub redirects the old address, so old links still work.
 
 ## License
 

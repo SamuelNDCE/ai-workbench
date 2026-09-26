@@ -38,6 +38,8 @@ bundle_skills() {
       echo "project-design-doc safe-section-deletion" ;;
     skill-library-maintenance)
       echo "skill-overlap-audit repo-index-drift-check" ;;
+    everyday-workflow)
+      echo "session-handoff design-review-loop capability-claim-grounding derived-figure-audit ui-change-visual-verify" ;;
     personal-workflow-ops)
       echo "personal-dashboard-style discord-todo-ops" ;;
     *)
@@ -54,6 +56,7 @@ Available bundles:
   windows-environment-ops             zombie-process-sweep, windows-shell-tool-selection, windows-process-restart
   project-content-safety              project-design-doc, safe-section-deletion
   skill-library-maintenance           skill-overlap-audit, repo-index-drift-check
+  everyday-workflow                   session-handoff, design-review-loop, capability-claim-grounding, derived-figure-audit, ui-change-visual-verify
   personal-workflow-ops               personal-dashboard-style, discord-todo-ops
 EOF
 }
@@ -81,4 +84,4 @@ for s in $SKILLS; do
 done
 
 echo ""
-echo "Bundle '$1' installed to $DEST. Restart Claude Code (or start a new session) to load them."
+echo "Bundle '$1' installed to $DEST. Restart your agent (or start a new session) to load them. For Codex or Hermes, pass their skills folder as the destination, or use install.sh."
