@@ -61,7 +61,7 @@ If your Hermes lives somewhere else, set `HERMES_HOME` before installing. The sa
 
 ### One instructions file for every agent
 
-Write your rules once in `AGENTS.md`, then make Claude Code read it too. Create a `CLAUDE.md` containing one line:
+Write your rules once in `AGENTS.md`, then make Claude Code read it too. A starter set is in [`templates/AGENTS.md`](templates/AGENTS.md). Create a `CLAUDE.md` containing one line:
 
 ```
 @AGENTS.md
@@ -133,7 +133,7 @@ Run it with no arguments to print every bundle name. It installs into `./.claude
 
 ## How I use Claude Code now
 
-What I actually do, as of 2026-09-26. None of it depends on Claude Code specifically, but the hooks do.
+What I actually do, as of 2026-09-26. None of it depends on Claude Code specifically, but the hooks do. This is the short version: [docs/how-i-use-claude-code.md](docs/how-i-use-claude-code.md) has each technique in detail with measured numbers, and the files to copy are in [`hooks/`](hooks) and [`templates/`](templates).
 
 **Standing rules live in a short global `CLAUDE.md`, and each project has its own `PROJECT.md`.** The global file holds rules earned from specific failures, each short enough to get followed. The per-project file holds what changes what you are allowed to do right now: how to deploy and what must be true first, which environment variables must exist, what to verify before claiming something works. A hook injects the project's file into every session, so it applies whether or not anyone remembered to open it. Every new project gets its `PROJECT.md` (and a `DESIGN.md` if it has a UI) before real work starts, and both are updated in the same commit as the change they describe.
 
@@ -171,7 +171,7 @@ Two lessons. A server being configured is not the same as it being reachable, so
 
 ### Hooks (Claude Code)
 
-A hook is a command the agent runs at a fixed point, with no prompting and no remembering. Mine:
+A hook is a command the agent runs at a fixed point, with no prompting and no remembering. The `PROJECT.md` loader and the checkpoint hook below are published in [`hooks/`](hooks) with a settings snippet to paste; the rest depend on my private notes setup. Mine:
 
 - **On every prompt:** search the notes for anything relevant and inject it; load the project's `PROJECT.md`; spot video links so they are ingested rather than skimmed.
 - **On session start:** load a short list of rules from past mistakes, so the same one is not made twice.
