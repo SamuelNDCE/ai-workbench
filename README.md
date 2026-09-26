@@ -73,9 +73,21 @@ Now Codex and Hermes read `AGENTS.md` directly, and Claude Code pulls it in thro
 
 The skills are instructions in markdown, so they work in any agent that can read a file and follow it. Two name tools that only exist in Claude Code: `repo-hygiene` (a GitHub MCP tool name) and `windows-process-restart` (a task-stop tool). In another agent those steps become "do the equivalent with whatever you have". A few others mention `CLAUDE.md` or `~/.claude/skills/` in passing (`capability-claim-grounding`, `dictation-garble-catcher`, `superbraindump`): read those as `AGENTS.md` and your agent's skills folder.
 
+## Guides and tools
+
+| If you want | Go to |
+|:---|:---|
+| **Every skill in detail**: what it does, how it works, why it is efficient | [docs/skills-catalog.md](docs/skills-catalog.md) |
+| **How I keep token spend down**, with the numbers and a 10-minute audit | [docs/token-efficiency.md](docs/token-efficiency.md) |
+| **How I use Claude Code**: each technique, how to copy it, what earned it | [docs/how-i-use-claude-code.md](docs/how-i-use-claude-code.md) |
+| **The hooks** and a settings snippet to paste | [hooks/](hooks/README.md) |
+| **A starter rules file** and a `PROJECT.md` template | [templates/](templates) |
+| **Measure your own setup**: what loads every session | `node scripts/measure-context.cjs` |
+| **Count your own usage**: skills, sub-agent dispatches, model naming | `node scripts/usage-report.cjs` |
+
 ## The skills, most used to least used
 
-Counts are how many times each skill was invoked by name in my Claude Code session transcripts touched in the last 45 days (to 2026-09-26). Skills that fire from a hook or a slash command can be undercounted, and Codex and Hermes usage is not in these numbers. "Here" means the skill is in this repo's `skills/` folder.
+Each skill is described in full in the [skills catalog](docs/skills-catalog.md). Counts are how many times each skill was invoked by name in my Claude Code session transcripts touched in the last 45 days (to 2026-09-26). Skills that fire from a hook or a slash command can be undercounted, and Codex and Hermes usage is not in these numbers. "Here" means the skill is in this repo's `skills/` folder.
 
 | # | Skill | Uses | What it does | Where |
 |--:|:---|--:|:---|:---|
@@ -135,7 +147,7 @@ Run it with no arguments to print every bundle name. It installs into `./.claude
 
 What I actually do, as of 2026-09-26. None of it depends on Claude Code specifically, but the hooks do. This is the short version: [docs/how-i-use-claude-code.md](docs/how-i-use-claude-code.md) has each technique in detail with measured numbers, and the files to copy are in [`hooks/`](hooks) and [`templates/`](templates).
 
-**Standing rules live in a short global `CLAUDE.md`, and each project has its own `PROJECT.md`.** The global file holds rules earned from specific failures, each short enough to get followed. The per-project file holds what changes what you are allowed to do right now: how to deploy and what must be true first, which environment variables must exist, what to verify before claiming something works. A hook injects the project's file into every session, so it applies whether or not anyone remembered to open it. Every new project gets its `PROJECT.md` (and a `DESIGN.md` if it has a UI) before real work starts, and both are updated in the same commit as the change they describe.
+**Standing rules live in a global `CLAUDE.md`, and each project has its own `PROJECT.md`.** The global file holds rules earned from specific failures. It should be short, and mine is not: it is about 64,000 characters today, which loads into every session (see [docs/token-efficiency.md](docs/token-efficiency.md) for the measurement and what I am doing about it). The per-project file holds what changes what you are allowed to do right now: how to deploy and what must be true first, which environment variables must exist, what to verify before claiming something works. A hook injects the project's file into every session, so it applies whether or not anyone remembered to open it. Every new project gets its `PROJECT.md` (and a `DESIGN.md` if it has a UI) before real work starts, and both are updated in the same commit as the change they describe.
 
 **The model tier is chosen at dispatch, and every dispatch names it.** The main thread plans and makes the hard judgement calls. Execution, research and review agents run on the cheaper model, and I do not let a sub-agent inherit the expensive one by omission, because omission is how a research run quietly becomes very expensive. Keep the fan-out small: three or four independent branches usually answer what sixteen agents were sent to answer, and at most two multi-agent runs at once.
 
