@@ -82,6 +82,8 @@ It prints the file once. Run it again with the same `session_id` and it prints n
 
 **The checkpoint hook is narrower, not airtight.** A secret written into an already-tracked file is still committed unattended, so secret hygiene has to happen before the turn ends. That is what [`pre-push-secret-scan`](../skills/pre-push-secret-scan/SKILL.md) is for.
 
+**The checkpoint hook has no repo exclusion.** It commits tracked changes in whichever repo the shell's working directory is in when the turn ends. The shell's directory persists between commands, so a single `cd` into another repo to run a build makes that repo a checkpoint target for the rest of the session. Prefer `git -C <repo> ...` and a `cd` inside a single command over a bare `cd` that leaks.
+
 **`async: true` on the checkpoint.** It runs after the turn and cannot be skipped per turn, but it does not hold the next prompt up.
 
 ## Rules for writing your own

@@ -194,6 +194,17 @@ Every dev server, watcher and background shell is stopped as soon as its task is
 background and I wait for the completion signal, never a sleep loop. Commands expected to take more
 than about 20 seconds run in the background while I read the next task's context.
 
+### 13. When something is retired, update every reference the same turn
+
+When a service, tool or vendor is dropped, the instruction to me is to update, not just note it. Grep
+for the old name across the rules file, project docs, configs and scripts. Mark it retired with the
+date and what replaced it, instead of deleting the name, so a future session does not reintroduce
+it. Change live references to the replacement. If a reference cannot be fixed in the session, say so
+rather than leaving it silently stale.
+
+A changelog line that only records a deletion sends the next reader hunting for a tool that is not
+coming back. Write "X retired, use Y instead, here is the difference" or do not write the line.
+
 ## What is not here
 
 The notes system that hooks inject from, the skills tied to it, and the parts of my setup that name
