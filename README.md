@@ -87,47 +87,47 @@ The skills are instructions in markdown, so they work in any agent that can read
 
 ## The skills, most used to least used
 
-Each skill is described in full in the [skills catalog](docs/skills-catalog.md). Counts are how many times each skill was invoked by name in my Claude Code session transcripts touched in the last 45 days (to 2026-09-26). Skills that fire from a hook or a slash command can be undercounted, and Codex and Hermes usage is not in these numbers. "Here" means the skill is in this repo's `skills/` folder.
+Each skill is described in full in the [skills catalog](docs/skills-catalog.md). "Uses" is a tier (very high to unused), not an exact count, ranked from real invocations by name in my own session transcripts touched in the last 45 days (to 2026-09-26): exact counts are not published here. Skills that fire from a hook or a slash command can be undercounted, and Codex and Hermes usage is not in these numbers. "Here" means the skill is in this repo's `skills/` folder.
 
 | # | Skill | Uses | What it does | Where |
 |--:|:---|--:|:---|:---|
-| 1 | `session-handoff` | 91 | Writes a self-contained file so a cold session can resume tomorrow, or another session can take over now. Also resumes from one. | **Here** |
-| 2 | `superbraindump` | 56 | For a big, tangled, multi-part ramble: turns it into a rigorous prompt, confirms it, runs it. One of the skills I reach for when I cannot be bothered to write a prompt. | **Here** |
-| 3 | `brainstorming` | 39 | Explores what you actually want before any building starts. | [Superpowers](https://github.com/obra/superpowers) |
-| 4 | `dictation-garble-catcher` | 36 | Catches a voice-dictation mishear that sounds like a real project term and confirms it instead of running with the wrong word. | **Here** |
-| 5 | `braindump` | 31 | The lighter version of #2: messy ramble in, clean prompt out, quick confirm, run. | **Here** |
-| 6 | `design-review-loop` | 24 | Do a big batch of UI changes alone, check them yourself, then hand back one numbered walkthrough of what to look at. | **Here** |
-| 7 | `systematic-debugging` | 21 | A structured approach before proposing any fix. | [Superpowers](https://github.com/obra/superpowers) |
-| 8 | `pre-push-secret-scan` | 20 | A fast key, token and webhook scan before every `git push`. | **Here** |
-| 9 | `karpathy-guidelines` | 19 | Guardrails against over-engineering and unrequested scope. | [Library](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/misc-utilities/karpathy-guidelines/SKILL.md) |
-| 10 | `claude-api` | 16 | Current reference for the Anthropic API and SDKs. | Built into Claude Code |
-| 11 | `writing-plans` | 14 | Turns a spec into a step-by-step plan before touching code. | [Superpowers](https://github.com/obra/superpowers) |
-| 12 | `capability-claim-grounding` | 13 | Proves every claim in public copy (a feature, a price, a comparison) against the real build before it is written. | **Here** |
-| 13 | `artifact-design` | 13 | Design fundamentals for a published HTML page. | Built into Claude Code |
-| 14 | `security-review` | 10 | Security review of the pending changes on a branch. | Built into Claude Code |
-| 15 | `supabase-postgres-best-practices` | 9 | Postgres schema, RLS, index and query rules. | Supabase's own skill |
-| 16 | `supabase` | 8 | Anything touching Supabase: auth, RLS, edge functions, migrations. | Supabase's own skill |
-| 17 | `run` | 7 | Launch and drive the app to see a change actually working. | Built into Claude Code |
-| 18 | `update-config` | 6 | Change agent settings, hooks and permissions safely. | Built into Claude Code |
-| 19 | `subagent-driven-development` | 6 | Execute independent plan tasks with sub-agents in one session. | [Superpowers](https://github.com/obra/superpowers) |
-| 20 | `braindump-auto` | 5 | Same as `braindump` but skips the confirmation step. | **Here** |
-| 21 | `verify-dont-trust` | 4 | Never accept a self-report as proof: re-check by a different route before marking anything done. | **Here** |
-| 22 | `ui-change-visual-verify` | 4 | Screenshot every section you changed. Catches global selectors silently restyling a new component. | **Here** |
-| 23 | `project-design-doc` | 4 | A persistent per-project design spec that is followed automatically. | **Here** |
-| 24 | `repo-hygiene` | 4 | Cleans proven-junk files and makes every new repo private by default. | **Here** |
-| 25 | `safe-section-deletion` | 3 | Search the whole codebase for references before deleting a section or symbol. | **Here** |
-| 26 | `zombie-process-sweep` | 1 | Finds and kills orphaned dev servers and watchers at the end of a session. | **Here** |
-| 27 | `windows-shell-tool-selection` | 1 | When to use Bash versus PowerShell on Windows, and the syntax traps between them. | **Here** |
-| 28 | `derived-figure-audit` | 0 | Re-derives every computed figure in a document from its source so the numbers agree. | **Here** |
-| 28 | `full-account-security-audit` | 0 | Periodic full audit: every repo, full history, `.env` files, secret-scanning alerts. | **Here** |
-| 28 | `public-repo-leak-retraction` | 0 | Cleanup when a secret already got out: scrub, rewrite history, force-push, verify. | **Here** |
-| 28 | `large-task-session-split` | 0 | Split a big task into independent pieces, one fresh session each. | **Here** |
-| 28 | `worktree-task-pack-verification` | 0 | One git worktree and one independent verifier per piece, full gate before any merge. | **Here** |
-| 28 | `windows-process-restart` | 0 | Safely restart a supervised Windows background process with real verification. | **Here** |
-| 28 | `skill-overlap-audit` | 0 | Finds near-duplicate skills in a library. | **Here** |
-| 28 | `repo-index-drift-check` | 0 | Checks a hub repo's claimed counts against what the linked repos contain now. | **Here** |
-| 28 | `personal-dashboard-style` | 0 | A fixed dark HTML report style instead of a new look each time. | **Here** |
-| 28 | `discord-todo-ops` | 0 | Wraps a Discord reaction-based shared todo list into one skill. | **Here** |
+| 1 | `session-handoff` | very high | Writes a self-contained file so a cold session can resume tomorrow, or another session can take over now. Also resumes from one. | **Here** |
+| 2 | `superbraindump` | very high | For a big, tangled, multi-part ramble: turns it into a rigorous prompt, confirms it, runs it. One of the skills I reach for when I cannot be bothered to write a prompt. | **Here** |
+| 3 | `brainstorming` | high | Explores what you actually want before any building starts. | [Superpowers](https://github.com/obra/superpowers) |
+| 4 | `dictation-garble-catcher` | high | Catches a voice-dictation mishear that sounds like a real project term and confirms it instead of running with the wrong word. | **Here** |
+| 5 | `braindump` | high | The lighter version of #2: messy ramble in, clean prompt out, quick confirm, run. | **Here** |
+| 6 | `design-review-loop` | high | Do a big batch of UI changes alone, check them yourself, then hand back one numbered walkthrough of what to look at. | **Here** |
+| 7 | `systematic-debugging` | high | A structured approach before proposing any fix. | [Superpowers](https://github.com/obra/superpowers) |
+| 8 | `pre-push-secret-scan` | high | A fast key, token and webhook scan before every `git push`. | **Here** |
+| 9 | `karpathy-guidelines` | high | Guardrails against over-engineering and unrequested scope. | [Library](https://github.com/SamuelNDCE/claude-super-skill-library/blob/main/skills/misc-utilities/karpathy-guidelines/SKILL.md) |
+| 10 | `claude-api` | high | Current reference for the Anthropic API and SDKs. | Built into Claude Code |
+| 11 | `writing-plans` | moderate | Turns a spec into a step-by-step plan before touching code. | [Superpowers](https://github.com/obra/superpowers) |
+| 12 | `capability-claim-grounding` | moderate | Proves every claim in public copy (a feature, a price, a comparison) against the real build before it is written. | **Here** |
+| 13 | `artifact-design` | moderate | Design fundamentals for a published HTML page. | Built into Claude Code |
+| 14 | `security-review` | moderate | Security review of the pending changes on a branch. | Built into Claude Code |
+| 15 | `supabase-postgres-best-practices` | moderate | Postgres schema, RLS, index and query rules. | Supabase's own skill |
+| 16 | `supabase` | moderate | Anything touching Supabase: auth, RLS, edge functions, migrations. | Supabase's own skill |
+| 17 | `run` | moderate | Launch and drive the app to see a change actually working. | Built into Claude Code |
+| 18 | `update-config` | moderate | Change agent settings, hooks and permissions safely. | Built into Claude Code |
+| 19 | `subagent-driven-development` | moderate | Execute independent plan tasks with sub-agents in one session. | [Superpowers](https://github.com/obra/superpowers) |
+| 20 | `braindump-auto` | moderate | Same as `braindump` but skips the confirmation step. | **Here** |
+| 21 | `verify-dont-trust` | low | Never accept a self-report as proof: re-check by a different route before marking anything done. | **Here** |
+| 22 | `ui-change-visual-verify` | low | Screenshot every section you changed. Catches global selectors silently restyling a new component. | **Here** |
+| 23 | `project-design-doc` | low | A persistent per-project design spec that is followed automatically. | **Here** |
+| 24 | `repo-hygiene` | low | Cleans proven-junk files and makes every new repo private by default. | **Here** |
+| 25 | `safe-section-deletion` | low | Search the whole codebase for references before deleting a section or symbol. | **Here** |
+| 26 | `zombie-process-sweep` | low | Finds and kills orphaned dev servers and watchers at the end of a session. | **Here** |
+| 27 | `windows-shell-tool-selection` | low | When to use Bash versus PowerShell on Windows, and the syntax traps between them. | **Here** |
+| 28 | `derived-figure-audit` | unused | Re-derives every computed figure in a document from its source so the numbers agree. | **Here** |
+| 28 | `full-account-security-audit` | unused | Periodic full audit: every repo, full history, `.env` files, secret-scanning alerts. | **Here** |
+| 28 | `public-repo-leak-retraction` | unused | Cleanup when a secret already got out: scrub, rewrite history, force-push, verify. | **Here** |
+| 28 | `large-task-session-split` | unused | Split a big task into independent pieces, one fresh session each. | **Here** |
+| 28 | `worktree-task-pack-verification` | unused | One git worktree and one independent verifier per piece, full gate before any merge. | **Here** |
+| 28 | `windows-process-restart` | unused | Safely restart a supervised Windows background process with real verification. | **Here** |
+| 28 | `skill-overlap-audit` | unused | Finds near-duplicate skills in a library. | **Here** |
+| 28 | `repo-index-drift-check` | unused | Checks a hub repo's claimed counts against what the linked repos contain now. | **Here** |
+| 28 | `personal-dashboard-style` | unused | A fixed dark HTML report style instead of a new look each time. | **Here** |
+| 28 | `discord-todo-ops` | unused | Wraps a Discord reaction-based shared todo list into one skill. | **Here** |
 
 Rows marked 0 were not invoked in this window. Some are insurance skills you want to exist and never call often (leak retraction, full audits), and some I have simply outgrown. They stay because they still work.
 
