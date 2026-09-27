@@ -133,6 +133,15 @@ Never sleep-loop.
 
 ## Multipliers: the expensive part
 
+**17a. Tier by price, not by habit.** Pick a cheap model, roughly under $10 to $15 per million output
+tokens on whatever provider you use, and default to it for the vast majority of work: routine
+execution, research, code review, day-to-day sub-agent dispatches. That tier is enough for almost
+everything a coding agent does. Reserve a flagship, more expensive model (on Claude, that is Opus or
+Fable rather than Sonnet or Haiku) for the small slice that actually needs it: a security review, a
+hard architecture call, or planning and judgement the main thread itself does. This is a policy, not a
+measurement: I have not benchmarked quality against price here, so treat the split as a starting point
+and adjust it against your own results.
+
 **17. Name the model on every sub-agent dispatch.** A dispatch that leaves the model out inherits the
 main session's model. If that is your most expensive one, a research run quietly becomes very
 expensive. Research, execution and review run on the cheaper model, and the main thread plans and

@@ -1,4 +1,9 @@
-# How I use Claude Code, in detail
+# How I use my agent harness, in detail
+
+I use Claude Code day to day, so that is the worked example below. The skills and `AGENTS.md`
+underneath are harness-agnostic (see the README's Codex/Hermes install rows); anything naming Claude
+Code specifically here (hooks, the `Skill`/`Agent`/`Workflow` tools, `~/.claude/`) is that harness's
+own mechanism, not a claim about any other one. Swap in your harness's equivalent.
 
 The [README](../README.md) has the short version. This is the longer one: each technique, how to
 reproduce it, and the failure that earned it. Everything here was checked against my own setup on
@@ -99,7 +104,7 @@ The adherence numbers are in the table above: this rule is followed most of the 
 
 ### 4. Hand off instead of running a long session
 
-`session-handoff` is my most-used skill by a wide margin (91 uses). A long session drifts: early
+`session-handoff` is my most-used skill by a wide margin. A long session drifts: early
 decisions get compressed away and the model starts contradicting them. When work stops midway, the
 skill writes a self-contained file with the state, what is verified, what is not, and the next
 action. A fresh session reads it, checks its claims still hold, and continues.
